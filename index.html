@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Virtual - Supermercado X</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chat-container { height: calc(100vh - 200px); }
+        .bubble-bot { border-radius: 18px 18px 18px 2px; }
+        .bubble-user { border-radius: 18px 18px 2px 18px; }
+        .modal-active { display: flex !important; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans">
+
+    <div class="max-w-md mx-auto bg-white shadow-2xl flex flex-col h-screen relative">
+        <!-- Header -->
+        <div class="bg-blue-800 p-4 flex items-center justify-between shadow-md z-10">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3 font-bold text-blue-800 shadow-inner text-xl">X</div>
+                <div>
+                    <h1 class="text-white font-bold text-base">Supermercado X</h1>
+                    <p class="text-blue-100 text-[10px] uppercase tracking-wider">Gestión de RRHH</p>
+                </div>
+            </div>
+            <div class="text-white text-[10px] text-right">
+                <p>Canal Oficial</p>
+                <p class="opacity-75">Asistencia 24/7</p>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chat-box" class="chat-container overflow-y-auto p-4 space-y-4 bg-slate-50">
+            <!-- Bot Welcome -->
+            <div class="flex justify-start">
+                <div class="bubble-bot bg-white border border-slate-200 p-3 max-w-[85%] text-slate-800 shadow-sm text-sm">
+                    Hola, bienvenido al asistente virtual de **Supermercado X**. 
+                    
+                    ¿Cómo podemos ayudarte hoy con respecto al procedimiento de ausencias o emergencias?
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Options -->
+        <div id="quick-actions" class="p-2 overflow-x-auto whitespace-nowrap border-t border-slate-100 bg-white">
+            <button onclick="startCertificateFlow()" class="inline-block bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold px-4 py-2 rounded-full border border-blue-200 mr-2 transition-all">📄 Reportar Ausencia</button>
+            <button onclick="handleOption('urgencia')" class="inline-block bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-4 py-2 rounded-full border border-slate-300 mr-2 transition-all">🚨 Urgencia Médica</button>
+            <button onclick="handleOption('cliente')" class="inline-block bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-4 py-2 rounded-full border border-slate-300 mr-2 transition-all">👥 Incidente Cliente</button>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-4 bg-white border-t border-slate-200">
+            <div class="flex space-x-2">
+                <input type="text" id="user-input" placeholder="Escribe tu consulta..." class="flex-1 border border-slate-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <button onclick="sendMessage()" class="bg-blue-800 text-white p-2 rounded-full hover:bg-blue-900 transition-transform active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Formulario -->
+        <div id="cert-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+            <div class="bg-white rounded-2xl w-full max-w-xs overflow-hidden shadow-2xl">
+                <div class="bg-blue-800 p-3 text-white flex justify-between items-center">
+                    <span class="font-bold text-sm">Reporte de Ausencia</span>
+                    <button onclick="closeModal()" class="text-white hover:text-blue-200 text-xl">&times;</button>
+                </div>
+                <div class="p-4 space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase">Colaborador y Legajo</label>
+                        <input type="text" id="form-name" placeholder="Nombre completo - Legajo" class="w-full border-b border-slate-300 py-1 text-sm focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase">Motivo (Salud/Familiar)</label>
+                        <input type="text" id="form-diag" placeholder="Ej: Reposo médico 48hs" class="w-full border-b border-slate-300 py-1 text-sm focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase">Adjuntar Certificado</label>
+                        <div class="mt-1 border-2 border-dashed border-slate-300 rounded-lg p-4 bg-slate-50 hover:bg-slate-100 cursor-pointer relative text-center">
+                            <input type="file" id="form-file" class="absolute inset-0 opacity-0 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span id="file-label" class="text-[10px] text-slate-500 block mt-1">Cargar foto</span>
+                        </div>
+                    </div>
+                    <button onclick="submitCertificate()" class="w-full bg-blue-800 text-white font-bold py-2 rounded-lg mt-2 shadow-lg hover:bg-blue-900 transition-colors">Enviar Reporte</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const modal = document.getElementById('cert-modal');
+        const fileInput = document.getElementById('form-file');
+        const fileLabel = document.getElementById('file-label');
+
+        const DATA = {
+            urgencia: "En caso de URGENCIAS:\n📞 Central: **4351111**.\n📞 ART: **0800 4444 278**.\n📧 Notificar a RRHH y Medicina Laboral.",
+            cliente: "Protocolo Accidentes Clientes:\n1. Llamar a Urgencias inmediatamente.\n2. Solicitar firma de **DESENTIMIENTO** si el cliente rechaza traslado.\n3. Informar por mail con datos de testigos.",
+            success: "✅ **Reporte Enviado Correctamente**\n\nSe ha notificado al área de RRHH. \n\n⚠️ **RECUERDA:** Es obligatorio presentar el **certificado físico original** al momento de tu regreso a la sucursal para validar la ausencia."
+        };
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileLabel.innerText = "Archivo listo";
+                fileLabel.classList.add('text-blue-600', 'font-bold');
+            }
+        });
+
+        function addMessage(text, isUser = false) {
+            const wrap = document.createElement('div');
+            wrap.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+            const b = document.createElement('div');
+            b.className = `${isUser ? 'bubble-user bg-blue-800 text-white' : 'bubble-bot bg-white border border-slate-200 text-slate-800'} p-3 max-w-[85%] shadow-sm whitespace-pre-line text-sm transition-all`;
+            b.innerText = text;
+            wrap.appendChild(b);
+            chatBox.appendChild(wrap);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function handleOption(key) {
+            const texts = { urgencia: "Tengo una urgencia", cliente: "Accidente con un cliente" };
+            addMessage(texts[key], true);
+            setTimeout(() => addMessage(DATA[key]), 400);
+        }
+
+        function startCertificateFlow() { modal.classList.add('modal-active'); }
+        function closeModal() { modal.classList.remove('modal-active'); }
+
+        function submitCertificate() {
+            const name = document.getElementById('form-name').value;
+            if (!name) return alert("Ingresa tu nombre y legajo.");
+            closeModal();
+            addMessage(`Enviando reporte de ausencia de ${name}...`, true);
+            setTimeout(() => addMessage(DATA.success), 800);
+        }
+
+        function sendMessage() {
+            const val = userInput.value.trim();
+            if (!val) return;
+            addMessage(val, true);
+            userInput.value = '';
+            setTimeout(() => addMessage("Entendido. Por favor utiliza los botones de acceso rápido para gestionar reportes médicos o urgencias."), 600);
+        }
+
+        userInput.addEventListener("keypress", (e) => e.key === "Enter" && sendMessage());
+    </script>
+</body>
+</html>
