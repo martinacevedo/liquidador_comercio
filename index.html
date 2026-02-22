@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquidador Comercio - Sincronizado v3.5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        @media print {
+            .no-print { display: none; }
+            body { background: white; padding: 0; }
+            .receipt-shadow { box-shadow: none !important; border: 1px solid #e2e8f0; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-900 pb-12">
+
+    <header class="bg-indigo-700 text-white p-4 mb-6 shadow-lg no-print">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-tight">ComercioFlow <span class="text-indigo-200 font-normal text-sm">v3.5</span></h1>
+            <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-md">
+                IMPRIMIR RECIBO
+            </button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 grid lg:grid-cols-12 gap-8">
+        
+        <aside class="lg:col-span-4 space-y-6 no-print">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <h2 class="text-xs font-black text-indigo-500 uppercase tracking-widest mb-6">Configuración de Liquidación</h2>
+                
+                <div class="space-y-4">
+                    <!-- Selector de Periodo -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Mes</label>
+                            <select id="mesLiquidacion" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-3 text-sm focus:border-indigo-500 outline-none">
+                                <option value="Enero">Enero</option><option value="Febrero">Febrero</option>
+                                <option value="Marzo">Marzo</option><option value="Abril">Abril</option>
+                                <option value="Mayo">Mayo</option><option value="Junio">Junio</option>
+                                <option value="Julio">Julio</option><option value="Agosto">Agosto</option>
+                                <option value="Septiembre">Septiembre</option><option value="Octubre">Octubre</option>
+                                <option value="Noviembre">Noviembre</option><option value="Diciembre" selected>Diciembre</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Año</label>
+                            <input type="number" id="anioLiquidacion" value="2025" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-3 text-sm focus:border-indigo-500 outline-none font-bold">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Categoría (Escala Dic 2025)</label>
+                        <select id="categoria" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-3 text-sm focus:border-indigo-500 outline-none">
+                            <optgroup label="Administrativo">
+                                <option value="1067268" data-nombre="Administrativo A">Administrativo A</option>
+                                <option value="1071860" data-nombre="Administrativo B">Administrativo B</option>
+                                <option value="1076448" data-nombre="Administrativo C">Administrativo C</option>
+                                <option value="1090218" data-nombre="Administrativo D" selected>Administrativo D</option>
+                                <option value="1101690" data-nombre="Administrativo E">Administrativo E</option>
+                                <option value="1118519" data-nombre="Administrativo F">Administrativo F</option>
+                            </optgroup>
+                            <optgroup label="Maestranza">
+                                <option value="1055795" data-nombre="Maestranza A">Maestranza A</option>
+                                <option value="1058852" data-nombre="Maestranza B">Maestranza B</option>
+                                <option value="1069560" data-nombre="Maestranza C">Maestranza C</option>
+                            </optgroup>
+                            <optgroup label="Cajero">
+                                <option value="1071091" data-nombre="Cajero A">Cajero A</option>
+                                <option value="1076448" data-nombre="Cajero B">Cajero B</option>
+                                <option value="1083333" data-nombre="Cajero C">Cajero C</option>
+                            </optgroup>
+                            <optgroup label="Vendedor">
+                                <option value="1071091" data-nombre="Vendedor A">Vendedor A</option>
+                                <option value="1094044" data-nombre="Vendedor B">Vendedor B</option>
+                                <option value="1101690" data-nombre="Vendedor C">Vendedor C</option>
+                                <option value="1118519" data-nombre="Vendedor D">Vendedor D</option>
+                            </optgroup>
+                            <optgroup label="Auxiliar Especializado">
+                                <option value="1080274" data-nombre="Auxiliar Esp. A">Auxiliar Esp. A</option>
+                                <option value="1094041" data-nombre="Auxiliar Esp. B">Auxiliar Esp. B</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Antigüedad (años)</label>
+                            <input type="number" id="aniosAntiguedad" value="13" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-3 text-sm focus:border-indigo-500 outline-none font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Días Trabajados</label>
+                            <input type="number" id="diasTrabajados" value="17" min="1" max="30" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-3 text-sm focus:border-indigo-500 outline-none font-bold text-indigo-600">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Domingos (hs)</label>
+                            <input type="number" id="domingos" value="0" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-3 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Feriados (días)</label>
+                            <input type="number" id="feriados" value="0" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-3 text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Opciones de Descuento -->
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="chkAfiliacion" checked class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                            <span class="text-xs font-bold text-slate-700 uppercase">Aplicar Cuota Afiliación (1%)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="lg:col-span-8">
+            <div id="recibo-container" class="receipt-shadow bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
+                <div class="bg-slate-900 p-8 text-white flex justify-between items-end">
+                    <div>
+                        <h2 class="text-3xl font-black italic tracking-tighter uppercase">Recibo de Sueldo</h2>
+                        <p class="text-slate-400 text-xs mt-1 uppercase font-bold">Periodo: <span id="res-periodo"></span> | Mensualizado</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[10px] font-black text-slate-500 uppercase">Valor Hora / Día</div>
+                        <div id="res-valores-base" class="text-sm font-bold text-indigo-400"></div>
+                    </div>
+                </div>
+
+                <div class="p-8">
+                    <div class="grid grid-cols-4 gap-4 mb-8 text-[10px] uppercase font-bold text-slate-500">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">Categoría: <span id="res-categoria" class="block text-slate-900 text-xs font-black"></span></div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">Antigüedad: <span id="res-antiguedad" class="block text-slate-900 text-xs font-black"></span></div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">Básico Conv.: <span id="res-basico-conv" class="block text-slate-900 text-xs font-black"></span></div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">Días: <span id="res-dias" class="block text-indigo-600 text-xs font-black"></span></div>
+                    </div>
+
+                    <table class="w-full text-[11px]">
+                        <thead>
+                            <tr class="border-b-2 border-slate-100 text-slate-400 uppercase text-[9px] font-black tracking-widest">
+                                <th class="py-4 text-left">Concepto</th>
+                                <th class="py-4 text-center">Unid.</th>
+                                <th class="py-4 text-right">Haberes</th>
+                                <th class="py-4 text-right">No Rem.</th>
+                                <th class="py-4 text-right">Descuentos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-body" class="divide-y divide-slate-50"></tbody>
+                    </table>
+
+                    <div class="mt-8 grid md:grid-cols-2 gap-8 items-end">
+                        <div class="space-y-2 text-[10px] font-bold text-slate-600 uppercase">
+                            <div class="flex justify-between border-b border-slate-100 pb-1"><span>Subtotal Remunerativo</span><span id="total-rem"></span></div>
+                            <div class="flex justify-between border-b border-slate-100 pb-1"><span>Subtotal No Remunerativo</span><span id="total-norem"></span></div>
+                            <div class="flex justify-between border-b border-slate-100 pb-1 text-red-500 font-black"><span>Total Descuentos</span><span id="total-desc"></span></div>
+                        </div>
+                        <div class="bg-indigo-600 p-6 rounded-[2rem] text-white shadow-xl">
+                            <p class="text-[10px] uppercase font-black opacity-60 mb-1">Neto a Cobrar</p>
+                            <span id="total-neto" class="text-4xl font-black"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
+
+        function actualizar() {
+            const basicoConv = parseFloat(document.getElementById('categoria').value);
+            const catNombre = document.getElementById('categoria').options[document.getElementById('categoria').selectedIndex].getAttribute('data-nombre');
+            const diasTrabajados = parseInt(document.getElementById('diasTrabajados').value) || 0;
+            const anios = parseInt(document.getElementById('aniosAntiguedad').value) || 0;
+            const numDom = parseInt(document.getElementById('domingos').value) || 0;
+            const numFer = parseInt(document.getElementById('feriados').value) || 0;
+            const mes = document.getElementById('mesLiquidacion').value;
+            const anio = document.getElementById('anioLiquidacion').value;
+            const aplicarAfiliacion = document.getElementById('chkAfiliacion').checked;
+
+            // 1. Antigüedad
+            const montoAntiguedadTotal = basicoConv * (anios / 100);
+            const sueldoBasicoConAntig = basicoConv + montoAntiguedadTotal;
+
+            // 2. Valores base
+            const valorHora = sueldoBasicoConAntig / 200;
+            const valorDia = sueldoBasicoConAntig / 30;
+
+            // 3. Haberes Remunerativos
+            const sueldoBasicoLiq = valorDia * diasTrabajados;
+            const montoDomingos = valorHora * 8 * numDom;
+            const montoFeriados = valorDia * numFer;
+
+            // 4. Presentismo Remunerativo (8.333333%)
+            const basePresentismoRem = sueldoBasicoLiq + montoDomingos + montoFeriados;
+            const montoPresentismoRem = basePresentismoRem * 0.08333333;
+            const totalRem = basePresentismoRem + montoPresentismoRem;
+
+            // 5. Conceptos No Remunerativos (Sincronizados con la planilla del usuario)
+            const noRemFijo = 40000;
+            const noRemAntiguedad = noRemFijo * (anios / 100);
+            const noRemPresentismo = (noRemFijo + noRemAntiguedad) * 0.08333333;
+            const totalNoRem = noRemFijo + noRemAntiguedad + noRemPresentismo;
+
+            // 6. Deducciones
+            const dJub = totalRem * 0.11;
+            const dLey = totalRem * 0.03;
+            const dOS = totalRem * 0.03;
+            const dSind = totalRem * 0.025;
+            const dFondo = totalRem * 0.015;
+            const dAfiliacion = aplicarAfiliacion ? (totalRem * 0.01) : 0;
+            
+            const totalDesc = dJub + dLey + dOS + dSind + dFondo + dAfiliacion;
+
+            // --- UI UPDATE ---
+            document.getElementById('res-periodo').innerText = `${mes} ${anio}`;
+            document.getElementById('res-categoria').innerText = catNombre;
+            document.getElementById('res-antiguedad').innerText = anios + " años";
+            document.getElementById('res-basico-conv').innerText = formatter.format(basicoConv);
+            document.getElementById('res-dias').innerText = diasTrabajados;
+            document.getElementById('res-valores-base').innerText = `H: ${formatter.format(valorHora)} | D: ${formatter.format(valorDia)}`;
+
+            document.getElementById('tabla-body').innerHTML = `
+                <tr>
+                    <td class="py-3 px-2">Sueldo Básico (inc. Antigüedad ${anios}%)</td>
+                    <td class="py-3 px-2 text-center">${diasTrabajados}</td>
+                    <td class="py-3 px-2 text-right font-bold">${formatter.format(sueldoBasicoLiq)}</td>
+                    <td>-</td><td>-</td>
+                </tr>
+                ${numDom > 0 ? `<tr><td class="py-3 px-2 pl-4">Comp. Adicional Domingo</td><td class="text-center">${numDom}</td><td class="text-right">${formatter.format(montoDomingos)}</td><td>-</td><td>-</td></tr>` : ''}
+                ${numFer > 0 ? `<tr><td class="py-3 px-2 pl-4">Premio Feriado Nacional</td><td class="text-center">${numFer}</td><td class="text-right">${formatter.format(montoFeriados)}</td><td>-</td><td>-</td></tr>` : ''}
+                <tr class="bg-indigo-50/20">
+                    <td class="py-3 px-2 font-bold italic">Presentismo (8.33%)</td>
+                    <td class="py-3 px-2 text-center">1</td>
+                    <td class="py-3 px-2 text-right font-black text-indigo-800">${formatter.format(montoPresentismoRem)}</td>
+                    <td>-</td><td>-</td>
+                </tr>
+                <tr class="text-amber-700 bg-amber-50/40">
+                    <td class="py-3 px-2 font-bold italic">Suma Fija No Rem. 2025</td>
+                    <td class="py-3 px-2 text-center">-</td>
+                    <td>-</td>
+                    <td class="py-3 px-2 text-right font-bold">${formatter.format(noRemFijo)}</td>
+                    <td>-</td>
+                </tr>
+                <tr class="text-amber-600 bg-amber-50/30">
+                    <td class="py-2 px-2 text-[10px] pl-6 italic">Antigüedad No Rem. (${anios}%)</td>
+                    <td class="py-2 px-2 text-center">-</td>
+                    <td>-</td>
+                    <td class="py-2 px-2 text-right font-medium">${formatter.format(noRemAntiguedad)}</td>
+                    <td>-</td>
+                </tr>
+                <tr class="text-amber-600 bg-amber-50/30">
+                    <td class="py-2 px-2 text-[10px] pl-6 italic font-bold">Presentismo No Rem. (8.33%)</td>
+                    <td class="py-2 px-2 text-center">-</td>
+                    <td>-</td>
+                    <td class="py-2 px-2 text-right font-bold border-b border-amber-200/50">${formatter.format(noRemPresentismo)}</td>
+                    <td>-</td>
+                </tr>
+                <tr class="text-slate-400 font-medium italic">
+                    <td class="py-2 px-2 pl-4">Jubilación (11%)</td>
+                    <td>-</td><td>-</td><td>-</td>
+                    <td class="py-2 px-2 text-right">${formatter.format(dJub)}</td>
+                </tr>
+                <tr class="text-slate-400 font-medium italic">
+                    <td class="py-2 px-2 pl-4">Ley 19.032 (3%)</td>
+                    <td>-</td><td>-</td><td>-</td>
+                    <td class="py-2 px-2 text-right">${formatter.format(dLey)}</td>
+                </tr>
+                <tr class="text-slate-400 font-medium italic">
+                    <td class="py-2 px-2 pl-4">Obra Social (3%)</td>
+                    <td>-</td><td>-</td><td>-</td>
+                    <td class="py-2 px-2 text-right">${formatter.format(dOS)}</td>
+                </tr>
+                <tr class="text-slate-400 font-medium italic">
+                    <td class="py-2 px-2 pl-4">Sindicato AGEC / FAECYS (2.5%)</td>
+                    <td>-</td><td>-</td><td>-</td>
+                    <td class="py-2 px-2 text-right">${formatter.format(dSind)}</td>
+                </tr>
+                <tr class="text-slate-400 font-medium italic">
+                    <td class="py-2 px-2 pl-4">Fondo Compensador (1.5%)</td>
+                    <td>-</td><td>-</td><td>-</td>
+                    <td class="py-2 px-2 text-right">${formatter.format(dFondo)}</td>
+                </tr>
+                ${aplicarAfiliacion ? `
+                <tr class="text-slate-400 font-medium italic border-b-2">
+                    <td class="py-2 px-2 pl-4">AFILIACIÓN (1%)</td>
+                    <td>-</td><td>-</td><td>-</td>
+                    <td class="py-2 px-2 text-right">${formatter.format(dAfiliacion)}</td>
+                </tr>
+                ` : ''}
+            `;
+
+            document.getElementById('total-rem').innerText = formatter.format(totalRem);
+            document.getElementById('total-norem').innerText = formatter.format(totalNoRem);
+            document.getElementById('total-desc').innerText = "-" + formatter.format(totalDesc);
+            document.getElementById('total-neto').innerText = formatter.format(totalRem + totalNoRem - totalDesc);
+        }
+
+        document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', actualizar));
+        window.onload = actualizar;
+    </script>
+</body>
+</html>
